@@ -105,4 +105,45 @@ app.post("/post", (req, res) => {
   res.json( {number: bbs.length } );
 });
 
+app.post("/like", (req, res) => {
+  const postId = Number(req.body.id) - 1;
+  if (bbs[postId]) {
+    bbs[postId].likes = (bbs[postId].likes || 0) + 1;
+    console.log(`Post ${postId} liked! Total likes: ${bbs[postId].likes}`);
+    res.json({ likes: bbs[postId].likes });
+  }
+});
+
+app.post("/delete", (req, res) => {
+  const postId = Number(req.body.id);
+  let found = false;
+  let newBbs = [];
+  for (let i = 0; i < bbs.length; i++) {
+      if (bbs[i].id !== postId) {
+          newBbs.push(bbs[i]);
+      } else {
+          found = true;
+      }
+  }
+  if (found) {
+      bbs = newBbs;
+      console.log(`Post ${postId} deleted.`);
+      res.json({ success: true ,number: bbs.length});
+  } 
+});
+
+app.post("/edit", (req, res) => {
+  const name = req.body.name;
+  const message = req.body.message;
+  const id = req.body.id;
+  const postId = Number(id) - 1;  // 投稿IDは1から始まるので-1で調整
+  if (bbs[postId]) {
+    bbs[postId].name = name;
+    bbs[postId].message = message;
+
+    console.log(`Post ${id} updated: ${name} - ${message}`);
+    res.json({ success: true, post: bbs[postId] });
+  }
+});
+
 app.listen(8080, () => console.log("Example app listening on port 8080!"));
